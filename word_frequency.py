@@ -1,25 +1,32 @@
+import re
+import string
+## add '' in STOP_WORDS
 STOP_WORDS = [
     'a', 'an', 'and', 'are', 'as', 'at', 'be', 'by', 'for', 'from', 'has',
     'he', 'i', 'in', 'is', 'it', 'its', 'of', 'on', 'that', 'the', 'to',
-    'were', 'will', 'with'
+    'were', 'will', 'with', ''
 ]
 
 
 class FileReader:
     def __init__(self, filename):
-        pass
+        self.filename = filename
 
     def read_contents(self):
         """
         This should read all the contents of the file
         and return them as one string.
         """
-        raise NotImplementedError("FileReader.read_contents")
+        with open(self.filename) as homework:
+            text = homework.read().lower()
+            return text
+            # return homework.read()
 
 
 class WordList:
     def __init__(self, text):
-        pass
+        self.text = re.split("[' '\n]", text)
+        # print(self.text)
 
     def extract_words(self):
         """
@@ -27,14 +34,19 @@ class WordList:
         is responsible for lowercasing all words and stripping
         them of punctuation.
         """
-        raise NotImplementedError("WordList.extract_words")
+        self.no_pun = sorted([word.strip(string.punctuation) for word in self.text])
+        return self.no_pun
 
     def remove_stop_words(self):
         """
         Removes all stop words from our word list. Expected to
         be run after extract_words.
         """
-        raise NotImplementedError("WordList.remove_stop_words")
+        for element in STOP_WORDS:
+            while element in self.no_pun:
+                self.no_pun.remove(element)
+        # print(self.no_pun)
+        
 
     def get_freqs(self):
         """
@@ -43,18 +55,25 @@ class WordList:
         extract_words and remove_stop_words. The data structure
         could be a dictionary or another type of object.
         """
-        raise NotImplementedError("WordList.get_freqs")
+        freqs ={}
+        for word in self.no_pun:
+            # print(word)
+            freqs[word]= self.no_pun.count(word)
+        # print(freqs)
+        return freqs
+
+        
 
 
 class FreqPrinter:
     def __init__(self, freqs):
-        pass
+        self.freqs = freqs
+        # print(self.freqs)
 
     def print_freqs(self):
         """
         Prints out a frequency chart of the top 10 items
         in our frequencies data structure.
-
         Example:
           her | 33   *********************************
         which | 12   ************
@@ -67,7 +86,10 @@ class FreqPrinter:
        rights | 6    ******
         right | 6    ******
         """
-        raise NotImplementedError("FreqPrinter.print_freqs")
+        for count in self.freqs:
+            star = "*" * self.freqs[count]
+            print_text= f"{count}  |  {self.freqs[count]} {star}"
+            print(f"{count}".rjust(15) + "|".rjust(8) + f"{self.freqs[count]}".ljust(8) + f"{star}".ljust(8))
 
 
 if __name__ == "__main__":
